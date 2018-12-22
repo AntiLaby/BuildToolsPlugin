@@ -1,0 +1,114 @@
+group = 'de.heisluft.buildtools'
+version = '0.0.1'
+
+apply plugin: 'java'
+apply plugin: 'maven-publish'
+apply plugin: 'signing'
+
+sourceCompatibility = 1.8
+
+compileJava {
+    options.encoding = 'UTF-8'
+}
+
+javadoc {
+    options.encoding = 'UTF-8'
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        url 'https://heisluft.tk/maven/'
+    }
+    maven {
+        url 'https://files.minecraftforge.net/maven/'
+    }
+}
+
+configurations {
+    shade
+    shade.extendsFrom compileOnly
+}
+
+task sourcesJar(type: Jar) {
+    from sourceSets.main.allSource
+    classifier = 'sources'
+}
+
+task javadocJar(type: Jar) {
+    from javadoc
+    classifier = 'javadoc'
+}
+
+dependencies {
+    compile gradleApi()
+    // TODO: MAKE THIS INDEPENDENT!!
+    compile files(gradle.gradleUserHomeDir.path + '/caches/buildtools/1.12.2/BuildData/bin/SpecialSource-2.jar')
+    compile files(gradle.gradleUserHomeDir.path + '/caches/buildtools/1.12.2/BuildData/bin/fernflower.jar')
+    compile files(gradle.gradleUserHomeDir.path + '/caches/buildtools/1.12.2/BuildData/bin/SpecialSource.jar')
+    shade 'com.googlecode.json-simple:json-simple:1.2.0'
+    shade('com.custardsource.dybdob:java-diff-utils-copy:1.0.5') {
+        transitive = false
+    }
+    shade 'net.sf.jopt-simple:jopt-simple:5.0.4'
+    shade 'org.eclipse.jgit:org.eclipse.jgit:5.1.3.201810200350-r'
+}
+
+sourceSets {
+    main.compileClasspath += configurations.shade
+    main.runtimeClasspath += configurations.shade
+    test.compileClasspath += configurations.shade
+    test.runtimeClasspath += configurations.shade
+}
+
+
+publishing {
+    repositories {
+        maven {
+            url = mavenRepo
+            credentials {
+                username = mavenUsername
+                password = mavenPassword
+            }
+            authentication {
+                digest(DigestAuthentication)
+            }
+
+        }
+    }
+    publications {
+        mavenJava(MavenPublication) {
+            pom {
+                developers {
+                    developer {
+                        id = 'heisluft'
+                        name = 'heisluft'
+                        email = 'heisluftlp@gmail.com'
+                        roles = ['developer']
+                    }
+                }
+            }
+            artifact sourcesJar
+            artifact javadocJar
+            from components.java
+        }
+    }
+}
+
+jar {
+    configurations.shade.each { dep ->
+        from(project.zipTree(dep)) {
+            exclude 'META-INF', 'META-INF/**'
+        }
+    }
+}
+
+signing {
+//    sign publishing.publications.mavenJava
+}
+
+publish.dependsOn test
+
+test {
+    useJUnit()
+}

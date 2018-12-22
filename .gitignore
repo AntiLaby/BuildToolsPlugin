@@ -1,0 +1,18 @@
+# Gitignore file for BuildToolsPlugin
+# Eclipse
+/.settings/
+/bin/
+*.launch
+.classpath
+/.project
+
+# IntelliJ
+/.idea/
+/out/
+*.iml
+*.iws
+*.ipr
+
+# Gradle
+/.gradle/
+/build/
