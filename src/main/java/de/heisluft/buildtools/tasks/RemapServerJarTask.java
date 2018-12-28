@@ -1,7 +1,6 @@
 package de.heisluft.buildtools.tasks;
 
 import de.heisluft.buildtools.utils.BuildInfo;
-import de.heisluft.buildtools.BuildToolsExtension;
 import de.heisluft.buildtools.utils.Utils;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.revwalk.RevCommit;
@@ -16,7 +15,7 @@ import java.nio.file.Path;
 public class RemapServerJarTask extends DefaultTask {
   @TaskAction
   public void remapJar() throws IOException, ReflectiveOperationException, GitAPIException {
-    String mcVersion = getProject().getExtensions().getByType(BuildToolsExtension.class).getMcVersion();
+    String mcVersion = Utils.getExtension(getProject()).getMcVersion();
     SetupReposTask reposTask = Utils.getTask(getProject(), "setupRepos");
     BuildInfo buildInfo = Utils.<FetchMetadataTask>getTask(getProject(), "fetchMetadata").getInfo().get();
     RevCommit mappings = reposTask.getBuildDataGit().get().log().addPath("mappings/" + buildInfo.mcInfo.ats)

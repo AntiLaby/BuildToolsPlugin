@@ -21,10 +21,8 @@ public class DownloadServerTask extends DefaultTask {
 
   @TaskAction
   public void downloadMinecraftServerTask() {
-    BuildInfo.MCInfo mcInfo = ((FetchMetadataTask) getProject()
-        .getTasksByName("fetchMetadata", false).iterator().next()).getInfo().get().mcInfo;
-    Path to = getProject().getGradle().getGradleUserHomeDir().toPath()
-        .resolve("caches/buildtools/" + mcInfo.gameVersion + "/vanilla.jar");
+    BuildInfo.MCInfo mcInfo = Utils.<FetchMetadataTask>getTask(getProject(), "fetchMetadata").getInfo().get().mcInfo;
+    Path to = Utils.getBasePath(getProject()).resolve(mcInfo.gameVersion + "/vanilla.jar");
     System.out.println(to);
     if(!Files.exists(to)) try {
       Files.createFile(to);

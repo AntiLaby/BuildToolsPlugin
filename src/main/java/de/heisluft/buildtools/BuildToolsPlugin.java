@@ -1,7 +1,8 @@
 package de.heisluft.buildtools;
 
-import de.heisluft.buildtools.tasks.ExcludeDependencies;
+import de.heisluft.buildtools.tasks.ExcludeDependenciesTask;
 import de.heisluft.buildtools.tasks.FetchMetadataTask;
+import de.heisluft.buildtools.tasks.RemapServerJarTask;
 import de.heisluft.buildtools.tasks.SetupReposTask;
 import de.heisluft.buildtools.utils.Server;
 import de.heisluft.buildtools.utils.Utils;
@@ -31,13 +32,15 @@ public class BuildToolsPlugin implements Plugin<Project> {
     SetupReposTask srt = tasks.create("setupRepos", SetupReposTask.class);
     SetMCInfoTask umt = tasks.create("setMCInfo", SetMCInfoTask.class);
     DownloadServerTask dst = tasks.create("downloadServer", DownloadServerTask.class);
-    ExcludeDependencies edt = tasks.create("excludeDeps", ExcludeDependencies.class);
+    ExcludeDependenciesTask edt = tasks.create("excludeDeps", ExcludeDependenciesTask.class);
+    RemapServerJarTask rsjt = tasks.create("remapServerJar", RemapServerJarTask.class);
     DecompileMCTask dmct = tasks.create("decompileMC", DecompileMCTask.class);
     umt.setDependsOn(Collections.singleton(srt));
     srt.setDependsOn(Collections.singleton(fmt));
     dst.setDependsOn(Collections.singleton(umt));
     edt.setDependsOn(Collections.singleton(dst));
-    dmct.setDependsOn(Collections.singleton(edt));
+    rsjt.setDependsOn(Collections.singleton(edt));
+    dmct.setDependsOn(Collections.singleton(rsjt));
     project.getRepositories().mavenCentral();
     project.getGradle().addListener(new DRL(project));
   }

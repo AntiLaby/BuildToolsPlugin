@@ -1,6 +1,7 @@
 package de.heisluft.buildtools.tasks;
 
 import de.heisluft.buildtools.utils.BuildInfo;
+import de.heisluft.buildtools.utils.Utils;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.TaskAction;
 import org.jetbrains.java.decompiler.main.decompiler.ConsoleDecompiler;
@@ -13,10 +14,8 @@ public class DecompileMCTask extends DefaultTask {
 
   @TaskAction
   public void decompileMC() {
-    BuildInfo.MCInfo mcInfo = ((FetchMetadataTask) getProject()
-        .getTasksByName("fetchMetadata", false).iterator().next()).getInfo().get().mcInfo;
-    Path base = getProject().getGradle().getGradleUserHomeDir().toPath().resolve("caches/buildtools/" + mcInfo.gameVersion)
-        .toAbsolutePath();
+    BuildInfo.MCInfo mcInfo = Utils.<FetchMetadataTask>getTask(getProject(), "fetchMetadata").getInfo().get().mcInfo;
+    Path base = Utils.getBasePath(getProject()).resolve(mcInfo.gameVersion).toAbsolutePath();
     Path decompiled = base.resolve("decompiled");
     if(!Files.exists(decompiled)) try {
       Files.createDirectory(decompiled);

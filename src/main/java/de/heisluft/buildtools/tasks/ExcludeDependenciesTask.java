@@ -1,6 +1,7 @@
 package de.heisluft.buildtools.tasks;
 
 import de.heisluft.buildtools.BuildToolsExtension;
+import de.heisluft.buildtools.utils.Utils;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.TaskAction;
 
@@ -15,7 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class ExcludeDependencies extends DefaultTask {
+public class ExcludeDependenciesTask extends DefaultTask {
 
   private static <K, V> Map<K, V> map(K key, V value) {
     Map<K, V> m = new HashMap<>(1);
@@ -33,10 +34,8 @@ public class ExcludeDependencies extends DefaultTask {
 
   @TaskAction
   public void excludeDeps() {
-    String mcVersion = getProject().getExtensions().getByType(BuildToolsExtension.class)
-        .getMcVersion();
-    Path from = getProject().getGradle().getGradleUserHomeDir().toPath()
-        .resolve("caches/buildtools/" + mcVersion + "/vanilla.jar");
+    String mcVersion = Utils.getExtension(getProject()).getMcVersion();
+    Path from = Utils.getBasePath(getProject()).resolve(mcVersion + "/vanilla.jar");
     Path to = from.getParent().resolve("vanilla-nodeps.jar");
     try(FileSystem fs = FileSystems.newFileSystem(URI.create("jar:file:/" +
         (Files.exists(to) ? to : Files.copy(from, to)).toAbsolutePath().toString()

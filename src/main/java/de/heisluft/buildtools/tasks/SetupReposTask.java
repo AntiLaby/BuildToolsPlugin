@@ -64,11 +64,9 @@ public class SetupReposTask extends DefaultTask {
 
   @TaskAction
   public void executeTask() {
-    BuildToolsExtension ex = getProject().getExtensions().getByType(BuildToolsExtension.class);
-    Path basePath = getProject().getGradle().getGradleUserHomeDir().toPath()
-        .resolve("caches/buildtools/" + ex.getMcVersion());
-    BuildInfo buildInfo = ((FetchMetadataTask) getProject().getTasksByName("fetchMetadata", false)
-        .iterator().next()).getInfo().get();
+    BuildToolsExtension ex = Utils.getExtension(getProject());
+    Path basePath = Utils.getBasePath(getProject()).resolve(ex.getMcVersion());
+    BuildInfo buildInfo = Utils.<FetchMetadataTask>getTask(getProject(), "fetchMetadata").getInfo().get();
     try {
       buildDataGit = setupRepo(basePath,
           "https://hub.spigotmc.org/stash/scm/spigot/builddata", null,

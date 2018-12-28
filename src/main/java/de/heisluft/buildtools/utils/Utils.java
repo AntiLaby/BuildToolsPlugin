@@ -1,12 +1,14 @@
 package de.heisluft.buildtools.utils;
 
 
+import de.heisluft.buildtools.BuildToolsExtension;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
 
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
@@ -14,21 +16,9 @@ import java.util.Map;
 import java.util.Scanner;
 
 public class Utils {
-  private final static char[] HEX_ARRAY = "0123456789abcdef".toCharArray();
-
   public static final String JSR_305 = "com.google.code.findbugs:jsr305:3.0.2";
   public static final Map<String, Map<String, String>> DEPS = new HashMap<>();
-
-  public static String MD5(byte[] bytes) throws NoSuchAlgorithmException {
-    byte[] bytes1 = MessageDigest.getInstance("MD5").digest(bytes);
-    char[] hexChars = new char[bytes1.length * 2];
-    for ( int j = 0; j < bytes1.length; j++ ) {
-      int v = bytes1[j] & 0xFF;
-      hexChars[j * 2] = HEX_ARRAY[v >>> 4];
-      hexChars[j * 2 + 1] = HEX_ARRAY[v & 0x0F];
-    }
-    return new String(hexChars);
-  }
+  private final static char[] HEX_ARRAY = "0123456789abcdef".toCharArray();
 
   static {
     DEPS.put("1.8.8",
@@ -50,7 +40,19 @@ public class Utils {
         map("netty", "4.1.25.Final", "troveOrFU", "it.unimi.dsi:fastutil:8.2.0", "guava", "21.0",
             "gson", "2.8.0", "comIO", "2.5", "comCod", "1.10", "comLan3", "3.5", "log4j", "2.8.1"));
   }
+
   private Utils() {}
+
+  public static String MD5(byte[] bytes) throws NoSuchAlgorithmException {
+    byte[] bytes1 = MessageDigest.getInstance("MD5").digest(bytes);
+    char[] hexChars = new char[bytes1.length * 2];
+    for(int j = 0; j < bytes1.length; j++) {
+      int v = bytes1[j] & 0xFF;
+      hexChars[j * 2] = HEX_ARRAY[v >>> 4];
+      hexChars[j * 2 + 1] = HEX_ARRAY[v & 0x0F];
+    }
+    return new String(hexChars);
+  }
 
   public static String getLastMinor(String mcVersion) {
     if(mcVersion.startsWith("1.8")) return "1.8.8";
@@ -84,6 +86,15 @@ public class Utils {
     }
   }
 
+  public static Path getBasePath(Project p) {
+    return p.getGradle().getGradleUserHomeDir().toPath().resolve("caches/buildtools/");
+  }
+
+  public static BuildToolsExtension getExtension(Project p) {
+    return p.getExtensions().getByType(BuildToolsExtension.class);
+  }
+
+  @SuppressWarnings("unchecked")
   public static <T extends Task> T getTask(Project p, String name) {
     return (T) p.getTasksByName("name", false).iterator().next();
   }
