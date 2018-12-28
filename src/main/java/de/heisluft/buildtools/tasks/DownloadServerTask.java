@@ -23,7 +23,6 @@ public class DownloadServerTask extends DefaultTask {
   public void downloadMinecraftServerTask() {
     BuildInfo.MCInfo mcInfo = Utils.<FetchMetadataTask>getTask(getProject(), "fetchMetadata").getInfo().get().mcInfo;
     Path to = Utils.getBasePath(getProject()).resolve(mcInfo.gameVersion + "/vanilla.jar");
-    System.out.println(to);
     if(!Files.exists(to)) try {
       Files.createFile(to);
       ReadableByteChannel rbc = Channels.newChannel(new URL(mcInfo.serverUrl).openStream());

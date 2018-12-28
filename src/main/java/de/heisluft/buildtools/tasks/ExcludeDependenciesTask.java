@@ -1,6 +1,5 @@
 package de.heisluft.buildtools.tasks;
 
-import de.heisluft.buildtools.BuildToolsExtension;
 import de.heisluft.buildtools.utils.Utils;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.TaskAction;
@@ -37,9 +36,10 @@ public class ExcludeDependenciesTask extends DefaultTask {
     String mcVersion = Utils.getExtension(getProject()).getMcVersion();
     Path from = Utils.getBasePath(getProject()).resolve(mcVersion + "/vanilla.jar");
     Path to = from.getParent().resolve("vanilla-nodeps.jar");
-    try(FileSystem fs = FileSystems.newFileSystem(URI.create("jar:file:/" +
-        (Files.exists(to) ? to : Files.copy(from, to)).toAbsolutePath().toString()
-            .replace('\\', '/')), map("create", "true"))) {
+    if(Files.exists(to)) return;
+    try(FileSystem fs = FileSystems.newFileSystem(URI.create(
+        "jar:file:/" + Files.copy(from, to).toAbsolutePath().toString().replace('\\', '/')),
+        map("create", "true"))) {
       deleteRec(fs.getPath("io"));
       // 1.8 uses trove4j
       if(mcVersion.equals("1.8")) deleteRec(fs.getPath("gnu"));

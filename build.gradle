@@ -42,10 +42,6 @@ task javadocJar(type: Jar) {
 
 dependencies {
   compile gradleApi()
-  // TODO: MAKE THIS INDEPENDENT!!
-  compile files(gradle.gradleUserHomeDir.path + '/caches/buildtools/1.12.2/BuildData/bin/SpecialSource-2.jar')
-  compile files(gradle.gradleUserHomeDir.path + '/caches/buildtools/1.12.2/BuildData/bin/fernflower.jar')
-  compile files(gradle.gradleUserHomeDir.path + '/caches/buildtools/1.12.2/BuildData/bin/SpecialSource.jar')
   shade 'com.googlecode.json-simple:json-simple:1.2.0'
   shade('com.custardsource.dybdob:java-diff-utils-copy:1.0.5') {
     transitive = false

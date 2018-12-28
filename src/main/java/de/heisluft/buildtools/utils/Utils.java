@@ -96,6 +96,6 @@ public class Utils {
 
   @SuppressWarnings("unchecked")
   public static <T extends Task> T getTask(Project p, String name) {
-    return (T) p.getTasksByName("name", false).iterator().next();
+    return (T) p.getTasksByName(name, false).iterator().next();
   }
 }
