@@ -15,28 +15,26 @@ public class DecompileMCTask extends DefaultTask {
 
   @TaskAction
   public void decompileMC() {
-    Path base = Utils.getBasePath(getProject()).resolve(Utils.getExtension(getProject()).getMcVersion()).toAbsolutePath();
-    Path decompiled = base.resolve("decompiled");
-    if(Files.exists(decompiled.resolve("mapped.jar"))) return;
-
-    if(!Files.exists(decompiled)) try {
-      Files.createDirectory(decompiled);
-    } catch(IOException e) {
-      throw new RuntimeException(e);
-    }
+    Path finalMappedJar = Utils.<RemapServerJarTask>getTask(getProject(), "remapServerJar")
+        .getMappedJar().get();
+    Path decompiled = finalMappedJar.resolveSibling("decompiled");
+    if(Files.exists(decompiled.resolve("final-mapped.jar"))) return;
     try {
-      URLClassLoader urlcl = new URLClassLoader(
-          new URL[]{base.resolve("BuildData/bin/fernflower.jar").toUri().toURL()}, getClass().getClassLoader());
+      if(!Files.exists(decompiled)) Files.createDirectory(decompiled);
+
+      URLClassLoader urlcl = new URLClassLoader(new URL[]{Utils.getBasePath(getProject()).resolve(
+          Utils.getExtension(getProject()).getMcVersion() + "/BuildData/bin/fernflower.jar")
+          .toUri().toURL()}, getClass().getClassLoader());
       Method ffMain = Class
           .forName("org.jetbrains.java.decompiler.main.decompiler.ConsoleDecompiler", true, urlcl)
           .getMethod("main", String[].class);
 
       ffMain.invoke(null,
-          (Object) new String[]{"-dgs=1", "-hdc=0", "-rbr=0", "-asc=1", "-udv=0", base
-              .resolve("mapped.jar").toString(), decompiled.toString()});
+          (Object) new String[]{"-dgs=1", "-hdc=0", "-rbr=0", "-asc=1", "-udv=0",
+              finalMappedJar.toString(), decompiled.toString()});
       urlcl.close();
     } catch(IOException | ReflectiveOperationException e) {
-      throw new RuntimeException(e);
+      throw new RuntimeException("Could not decompile mc", e);
     }
   }
 }

@@ -22,18 +22,20 @@ public class ExtractMCSourcesTask extends DefaultTask {
 
   @TaskAction
   public void extractMCSources() {
-    Path base = Utils.getBasePath(getProject()).resolve(Utils.getExtension(getProject()).getMcVersion()).resolve("decompiled").toAbsolutePath();
-    Path mJar = base.resolve("mapped.jar");
-    try(FileSystem fs = FileSystems.newFileSystem(URI.create(
-        "jar:file:/" + mJar.toString().replace('\\', '/')),
-        Utils.map("create", "true"))) {
+    Path base = Utils.<RemapServerJarTask>getTask(getProject(), "remapServerJar").getMappedJar()
+        .get().resolveSibling("decompiled").toAbsolutePath();
+    Path mJar = base.resolve("final-mapped.jar");
+    try(FileSystem fs = FileSystems
+        .newFileSystem(URI.create("jar:file:/" + mJar.toString().replace('\\', '/')),
+            Utils.map("create", "true"))) {
       Path srcMainJavaP = base.resolve("src/main/java");
       if(!Files.exists(srcMainJavaP)) Files.createDirectories(srcMainJavaP);
       Path srcMainResP = srcMainJavaP.resolveSibling("resources");
       if(!Files.exists(srcMainResP)) Files.createDirectory(srcMainResP);
-      for(Path p : Files.walk(fs.getPath("/")).filter((p) -> !Files.isDirectory(p)).collect(Collectors.toCollection(ArrayList::new))) {
-        Path to = p.getFileName().endsWith("java") ? srcMainJavaP.resolve(rmTrailingSlash(p)) : srcMainResP.resolve(rmTrailingSlash(p));
-        System.out.println(to.toAbsolutePath());
+      for(Path p : Files.walk(fs.getPath("/")).filter((p) -> !Files.isDirectory(p))
+          .collect(Collectors.toCollection(ArrayList::new))) {
+        Path to = p.getFileName().toString().endsWith("java") ? srcMainJavaP
+            .resolve(rmTrailingSlash(p)) : srcMainResP.resolve(rmTrailingSlash(p));
         if(!Files.isDirectory(to.getParent())) Files.createDirectories(to.getParent());
         Files.copy(p, to);
       }
