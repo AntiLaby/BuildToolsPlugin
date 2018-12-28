@@ -11,17 +11,9 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 public class ExcludeDependenciesTask extends DefaultTask {
-
-  private static <K, V> Map<K, V> map(K key, V value) {
-    Map<K, V> m = new HashMap<>(1);
-    m.put(key, value);
-    return m;
-  }
 
   private static void deleteRec(Path p) throws IOException {
     if(!Files.exists(p)) return;
@@ -39,7 +31,7 @@ public class ExcludeDependenciesTask extends DefaultTask {
     if(Files.exists(to)) return;
     try(FileSystem fs = FileSystems.newFileSystem(URI.create(
         "jar:file:/" + Files.copy(from, to).toAbsolutePath().toString().replace('\\', '/')),
-        map("create", "true"))) {
+        Utils.map("create", "true"))) {
       deleteRec(fs.getPath("io"));
       // 1.8 uses trove4j
       if(mcVersion.equals("1.8")) deleteRec(fs.getPath("gnu"));

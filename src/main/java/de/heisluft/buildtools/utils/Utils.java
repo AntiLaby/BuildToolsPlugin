@@ -64,6 +64,11 @@ public class Utils {
     throw new RuntimeException("Project can't be built against version " + mcVersion + "!");
   }
 
+  public static <K, V> Map<K, V> map(K key, V value) {
+    Map<K, V> m = new HashMap<>(1);
+    m.put(key, value);
+    return m;
+  }
   private static <K, V> Map<K, V> map(K k, V v, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5,
       K k6, V v6, K k7, V v7, K k8, V v8) {
     Map<K, V> m = new HashMap<>(7);

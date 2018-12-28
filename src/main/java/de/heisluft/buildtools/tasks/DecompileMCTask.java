@@ -1,6 +1,5 @@
 package de.heisluft.buildtools.tasks;
 
-import de.heisluft.buildtools.utils.BuildInfo;
 import de.heisluft.buildtools.utils.Utils;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.TaskAction;
@@ -16,10 +15,10 @@ public class DecompileMCTask extends DefaultTask {
 
   @TaskAction
   public void decompileMC() {
-    BuildInfo.MCInfo mcInfo = Utils.<FetchMetadataTask>getTask(getProject(), "fetchMetadata")
-        .getInfo().get().mcInfo;
-    Path base = Utils.getBasePath(getProject()).resolve(mcInfo.gameVersion).toAbsolutePath();
+    Path base = Utils.getBasePath(getProject()).resolve(Utils.getExtension(getProject()).getMcVersion()).toAbsolutePath();
     Path decompiled = base.resolve("decompiled");
+    if(Files.exists(decompiled.resolve("mapped.jar"))) return;
+
     if(!Files.exists(decompiled)) try {
       Files.createDirectory(decompiled);
     } catch(IOException e) {

@@ -1,6 +1,7 @@
 package de.heisluft.buildtools;
 
 import de.heisluft.buildtools.tasks.ExcludeDependenciesTask;
+import de.heisluft.buildtools.tasks.ExtractMCSourcesTask;
 import de.heisluft.buildtools.tasks.FetchMetadataTask;
 import de.heisluft.buildtools.tasks.RemapServerJarTask;
 import de.heisluft.buildtools.tasks.SetupReposTask;
@@ -35,12 +36,14 @@ public class BuildToolsPlugin implements Plugin<Project> {
     ExcludeDependenciesTask edt = tasks.create("excludeDeps", ExcludeDependenciesTask.class);
     RemapServerJarTask rsjt = tasks.create("remapServerJar", RemapServerJarTask.class);
     DecompileMCTask dmct = tasks.create("decompileMC", DecompileMCTask.class);
+    ExtractMCSourcesTask est = tasks.create("extractMCSources", ExtractMCSourcesTask.class);
     umt.setDependsOn(Collections.singleton(srt));
     srt.setDependsOn(Collections.singleton(fmt));
     dst.setDependsOn(Collections.singleton(umt));
     edt.setDependsOn(Collections.singleton(dst));
     rsjt.setDependsOn(Collections.singleton(edt));
     dmct.setDependsOn(Collections.singleton(rsjt));
+    est.setDependsOn(Collections.singleton(dmct));
     project.getRepositories().mavenCentral();
     project.getGradle().addListener(new DRL(project));
   }
