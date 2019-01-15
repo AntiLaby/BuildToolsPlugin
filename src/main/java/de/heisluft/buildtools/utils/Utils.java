@@ -1,14 +1,10 @@
 package de.heisluft.buildtools.utils;
 
 
-import de.heisluft.buildtools.BuildToolsExtension;
-import org.gradle.api.Project;
-import org.gradle.api.Task;
 
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
@@ -89,18 +85,5 @@ public class Utils {
       scanner.useDelimiter("\\A");
       return scanner.hasNext() ? scanner.next() : "";
     }
-  }
-
-  public static Path getBasePath(Project p) {
-    return p.getGradle().getGradleUserHomeDir().toPath().resolve("caches/buildtools/");
-  }
-
-  public static BuildToolsExtension getExtension(Project p) {
-    return p.getExtensions().getByType(BuildToolsExtension.class);
-  }
-
-  @SuppressWarnings("unchecked")
-  public static <T extends Task> T getTask(Project p, String name) {
-    return (T) p.getTasksByName(name, false).iterator().next();
   }
 }

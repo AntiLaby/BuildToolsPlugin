@@ -1,14 +1,13 @@
 package de.heisluft.buildtools.tasks;
 
+import de.heisluft.buildtools.BuildToolsExtension;
 import de.heisluft.buildtools.utils.BuildInfo;
 import de.heisluft.buildtools.utils.Server;
 import de.heisluft.buildtools.utils.Utils;
-import de.heisluft.buildtools.BuildToolsExtension;
 import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ResetCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.gradle.api.DefaultTask;
 import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.TaskAction;
 
@@ -16,7 +15,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-public class SetupReposTask extends DefaultTask {
+public class SetupReposTask extends BuildToolsTask {
 
   private Git buildDataGit;
   private Git craftBukkitGit;
@@ -26,7 +25,8 @@ public class SetupReposTask extends DefaultTask {
   private static Git setupRepo(Path basePath, String downloadURL, Server.APIType type,
       String refOrBranch) throws GitAPIException, IOException {
     Path folder = basePath.resolve(type != null ? type.getName() : "BuildData");
-    boolean updateRepo = Files.exists(folder) && Files.newDirectoryStream(folder).iterator().hasNext();
+    boolean updateRepo =
+        Files.exists(folder) && Files.newDirectoryStream(folder).iterator().hasNext();
     if(!updateRepo) {
       if(!Files.isDirectory(folder)) Files.createDirectories(folder);
       if(type == Server.APIType.PAPERSPIGOT)
@@ -40,7 +40,7 @@ public class SetupReposTask extends DefaultTask {
     }
     Git git = Git.open(folder.toFile());
     if(type != Server.APIType.PAPERSPIGOT)
-     git.reset().setRef(refOrBranch).setMode(ResetCommand.ResetType.HARD).call();
+      git.reset().setRef(refOrBranch).setMode(ResetCommand.ResetType.HARD).call();
     git.fetch().call();
 
     return git;
@@ -64,19 +64,16 @@ public class SetupReposTask extends DefaultTask {
 
   @TaskAction
   public void executeTask() {
-    BuildToolsExtension ex = Utils.getExtension(getProject());
-    Path basePath = Utils.getBasePath(getProject()).resolve(ex.getMcVersion());
-    BuildInfo buildInfo = Utils.<FetchMetadataTask>getTask(getProject(), "fetchMetadata").getInfo().get();
+    BuildToolsExtension ex = getExtension();
+    Path basePath = getBasePath().resolve(ex.getMcVersion());
+    BuildInfo buildInfo = this.<FetchMetadataTask>getTask("fetchMetadata").getInfo().get();
     try {
-      buildDataGit = setupRepo(basePath,
-          "https://hub.spigotmc.org/stash/scm/spigot/builddata", null,
-          buildInfo.BuildData);
-      craftBukkitGit = setupRepo(basePath,
-          "https://hub.spigotmc.org/stash/scm/spigot/craftbukkit",
+      buildDataGit = setupRepo(basePath, "https://hub.spigotmc.org/stash/scm/spigot/builddata",
+          null, buildInfo.BuildData);
+      craftBukkitGit = setupRepo(basePath, "https://hub.spigotmc.org/stash/scm/spigot/craftbukkit",
           Server.APIType.BUKKIT, buildInfo.CraftBukkit);
       if(ex.getType() == Server.APIType.SPIGOT || ex.getType() == Server.APIType.PAPERSPIGOT)
-        spigotGit = setupRepo(basePath,
-            "https://hub.spigotmc.org/stash/scm/spigot/spigot.git",
+        spigotGit = setupRepo(basePath, "https://hub.spigotmc.org/stash/scm/spigot/spigot.git",
             Server.APIType.SPIGOT, buildInfo.Spigot);
       if(ex.getType() == Server.APIType.PAPERSPIGOT)
         paperGit = setupRepo(basePath, "https://github.com/PaperMC/Paper.git",

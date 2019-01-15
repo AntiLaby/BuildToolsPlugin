@@ -1,9 +1,7 @@
 package de.heisluft.buildtools.tasks;
 
 import de.heisluft.buildtools.utils.BuildInfo;
-import de.heisluft.buildtools.utils.Utils;
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.gradle.api.DefaultTask;
 import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.TaskAction;
 
@@ -14,7 +12,7 @@ import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-public class RemapServerJarTask extends DefaultTask {
+public class RemapServerJarTask extends BuildToolsTask {
 
   private Path mappedJar;
 
@@ -24,14 +22,12 @@ public class RemapServerJarTask extends DefaultTask {
 
   @TaskAction
   public void remapJar() {
-    BuildInfo.MCInfo info = Utils.<FetchMetadataTask>getTask(getProject(), "fetchMetadata")
-        .getInfo().get().mcInfo;
-    Path base = Utils.getBasePath(getProject())
-        .resolve(Utils.getExtension(getProject()).getMcVersion());
+    BuildInfo.MCInfo info = this.<FetchMetadataTask>getTask("fetchMetadata").getInfo().get().mcInfo;
+    Path base = getBasePath().resolve(getExtension().getMcVersion());
     Path mappedDir;
     try {
       mappedDir = base.resolve("mapped-" +
-          Utils.<SetupReposTask>getTask(getProject(), "setupRepos").getBuildDataGit().get().log()
+          this.<SetupReposTask>getTask("setupRepos").getBuildDataGit().get().log()
               .addPath("mappings/" + info.ats).addPath("mappings/" + info.clMappings)
               .addPath("mappings/" + info.memberMappings).addPath("mappings/" + info.pkgMappings)
               .setMaxCount(1).call().iterator().next().getName());

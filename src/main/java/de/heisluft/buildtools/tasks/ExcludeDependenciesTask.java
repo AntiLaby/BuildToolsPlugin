@@ -1,7 +1,6 @@
 package de.heisluft.buildtools.tasks;
 
 import de.heisluft.buildtools.utils.Utils;
-import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.TaskAction;
 
 import java.io.IOException;
@@ -13,7 +12,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
-public class ExcludeDependenciesTask extends DefaultTask {
+public class ExcludeDependenciesTask extends BuildToolsTask {
 
   private static void deleteRec(Path p) throws IOException {
     if(!Files.exists(p)) return;
@@ -25,8 +24,8 @@ public class ExcludeDependenciesTask extends DefaultTask {
 
   @TaskAction
   public void excludeDeps() {
-    String mcVersion = Utils.getExtension(getProject()).getMcVersion();
-    Path from = Utils.getBasePath(getProject()).resolve(mcVersion + "/vanilla.jar");
+    String mcVersion = getExtension().getMcVersion();
+    Path from = getBasePath().resolve(mcVersion + "/vanilla.jar");
     Path to = from.getParent().resolve("vanilla-nodeps.jar");
     if(Files.exists(to)) return;
     try(FileSystem fs = FileSystems.newFileSystem(URI.create(

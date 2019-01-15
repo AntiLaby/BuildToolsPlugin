@@ -1,15 +1,8 @@
 package de.heisluft.buildtools;
 
-import de.heisluft.buildtools.tasks.ExcludeDependenciesTask;
-import de.heisluft.buildtools.tasks.ExtractMCSourcesTask;
-import de.heisluft.buildtools.tasks.FetchMetadataTask;
-import de.heisluft.buildtools.tasks.RemapServerJarTask;
-import de.heisluft.buildtools.tasks.SetupReposTask;
+import de.heisluft.buildtools.tasks.*;
 import de.heisluft.buildtools.utils.Server;
 import de.heisluft.buildtools.utils.Utils;
-import de.heisluft.buildtools.tasks.DecompileMCTask;
-import de.heisluft.buildtools.tasks.DownloadServerTask;
-import de.heisluft.buildtools.tasks.SetMCInfoTask;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.DependencyResolutionListener;
@@ -37,6 +30,8 @@ public class BuildToolsPlugin implements Plugin<Project> {
     RemapServerJarTask rsjt = tasks.create("remapServerJar", RemapServerJarTask.class);
     DecompileMCTask dmct = tasks.create("decompileMC", DecompileMCTask.class);
     ExtractMCSourcesTask est = tasks.create("extractMCSources", ExtractMCSourcesTask.class);
+    PatchMCTask pmct = tasks.create("patchMC", PatchMCTask.class);
+    SetupBuildGradleTask sbgt = tasks.create("setupBuildGradle", SetupBuildGradleTask.class);
     umt.setDependsOn(Collections.singleton(srt));
     srt.setDependsOn(Collections.singleton(fmt));
     dst.setDependsOn(Collections.singleton(umt));
@@ -44,6 +39,8 @@ public class BuildToolsPlugin implements Plugin<Project> {
     rsjt.setDependsOn(Collections.singleton(edt));
     dmct.setDependsOn(Collections.singleton(rsjt));
     est.setDependsOn(Collections.singleton(dmct));
+    pmct.setDependsOn(Collections.singleton(est));
+    sbgt.setDependsOn(Collections.singleton(pmct));
     project.getRepositories().mavenCentral();
     project.getGradle().addListener(new DRL(project));
   }

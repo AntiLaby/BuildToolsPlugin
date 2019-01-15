@@ -1,23 +1,23 @@
 group = 'de.heisluft.buildtools'
-version = '0.0.1'
+ version = '0.0.1'
 
-apply plugin: 'java'
-apply plugin: 'maven-publish'
+ apply plugin: 'java'
+ apply plugin: 'maven-publish'
 
-sourceCompatibility = 1.8
+ sourceCompatibility = 1.8
 
-repositories {
-    mavenCentral()
-}
+ repositories {
+     mavenCentral()
+ }
 
-dependencies {
-    compile "com.google.code.findbugs:jsr305:3.0.2"
-    compile "org.apache.logging.log4j:log4j-core:{LOG4J}"
-    compile "io.netty:netty-all:${NETTY}"
-    compile ${TROVE_OR_FASTUTIL}
-    compile "com.google.guava:guava:${GUAVA}"
-    compile "com.google.code.gson:gson:${GSON}"
-    compile "org.apache.commons:commons-lang3:${COMM_LANG_3}"
-    compile "commons-io:commons-io:${COMM_IO}"
-    compile "commons-codec:commons-codec:${COMM_CODEC}"
-}
+ dependencies {
+     compile "com.google.code.findbugs:jsr305:3.0.2"
+     compile "org.apache.logging.log4j:log4j-core:${log4j}"
+     compile "io.netty:netty-all:${netty}"
+     compile "${troveOrFU}"
+     compile "com.google.guava:guava:${guava}"
+     compile "com.google.code.gson:gson:${gson}"
+     compile "org.apache.commons:commons-lang3:${comLan3}"
+     compile "commons-io:commons-io:${comIO}"
+     compile "commons-codec:commons-codec:${comCod}"
+ }

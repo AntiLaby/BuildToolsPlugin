@@ -3,7 +3,6 @@ package de.heisluft.buildtools.tasks;
 import de.heisluft.buildtools.utils.BuildInfo;
 import de.heisluft.buildtools.utils.Utils;
 import de.heisluft.buildtools.BuildToolsExtension;
-import org.gradle.api.DefaultTask;
 import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.TaskAction;
 import org.json.simple.JSONObject;
@@ -12,7 +11,7 @@ import org.json.simple.parser.ParseException;
 
 import java.io.IOException;
 
-public class FetchMetadataTask extends DefaultTask {
+public class FetchMetadataTask extends BuildToolsTask {
 
   private BuildInfo info;
 

@@ -2,7 +2,6 @@ package de.heisluft.buildtools.tasks;
 
 import de.heisluft.buildtools.utils.BuildInfo;
 import de.heisluft.buildtools.utils.Utils;
-import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.TaskAction;
 
 import java.io.IOException;
@@ -15,14 +14,12 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.security.NoSuchAlgorithmException;
 
-public class DownloadServerTask extends DefaultTask {
-
-
+public class DownloadServerTask extends BuildToolsTask {
 
   @TaskAction
   public void downloadMinecraftServerTask() {
-    BuildInfo.MCInfo mcInfo = Utils.<FetchMetadataTask>getTask(getProject(), "fetchMetadata").getInfo().get().mcInfo;
-    Path to = Utils.getBasePath(getProject()).resolve(mcInfo.gameVersion + "/vanilla.jar");
+    BuildInfo.MCInfo mcInfo = this.<FetchMetadataTask>getTask("fetchMetadata").getInfo().get().mcInfo;
+    Path to = getBasePath().resolve(mcInfo.gameVersion + "/vanilla.jar");
     if(!Files.exists(to)) try {
       Files.createFile(to);
       ReadableByteChannel rbc = Channels.newChannel(new URL(mcInfo.serverUrl).openStream());
