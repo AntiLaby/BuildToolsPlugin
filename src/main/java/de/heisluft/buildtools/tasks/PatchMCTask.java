@@ -42,9 +42,7 @@ public class PatchMCTask extends BuildToolsTask {
           break;
         }
       }
-      if(!preludeFound) {
-        patchLines.add(0, "+++");
-      }
+      if(!preludeFound) patchLines.add(0, "+++");
       System.out.println("attempting to patch " + patchFile.getFileName());
       Patch parsedPatch = DiffUtils.parseUnifiedDiff(patchLines);
       Files.write(to, (List<String>) DiffUtils

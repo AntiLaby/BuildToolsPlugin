@@ -1,19 +1,21 @@
-group = 'de.heisluft.buildtools'
-version = '0.0.1'
+buildscript {
+  repositories {
+    jcenter()
+  }
+  dependencies {
+    classpath 'com.github.jengelman.gradle.plugins:shadow:4.0.4'
+  }
+}
 
+group 'de.heisluft.buildtools'
+version '0.0.1'
+
+apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: 'java'
 apply plugin: 'maven-publish'
 apply plugin: 'signing'
 
 sourceCompatibility = 1.8
-
-compileJava {
-  options.encoding = 'UTF-8'
-}
-
-javadoc {
-  options.encoding = 'UTF-8'
-}
 
 repositories {
   mavenCentral()
@@ -25,38 +27,16 @@ repositories {
   }
 }
 
-configurations {
-  shade
-  shade.extendsFrom compileOnly
-}
-
-task sourcesJar(type: Jar) {
-  from sourceSets.main.allSource
-  classifier = 'sources'
-}
-
-task javadocJar(type: Jar) {
-  from javadoc
-  classifier = 'javadoc'
-}
-
 dependencies {
-  compile gradleApi()
-  shade 'com.googlecode.json-simple:json-simple:1.2.0'
-  shade('com.custardsource.dybdob:java-diff-utils-copy:1.0.5') {
+  compileOnly gradleApi()
+  compile 'com.googlecode.json-simple:json-simple:1.2.0'
+  compile 'net.md-5:SpecialSource:1.8.5'
+  compile('com.custardsource.dybdob:java-diff-utils-copy:1.0.5') {
     transitive = false
   }
-  shade 'net.sf.jopt-simple:jopt-simple:5.0.4'
-  shade 'org.eclipse.jgit:org.eclipse.jgit:5.1.3.201810200350-r'
+  compile 'net.sf.jopt-simple:jopt-simple:5.0.4'
+  compile 'org.eclipse.jgit:org.eclipse.jgit:5.1.3.201810200350-r'
 }
-
-sourceSets {
-  main.compileClasspath += configurations.shade
-  main.runtimeClasspath += configurations.shade
-  test.compileClasspath += configurations.shade
-  test.runtimeClasspath += configurations.shade
-}
-
 
 publishing {
   repositories {
@@ -91,19 +71,36 @@ publishing {
   }
 }
 
-jar {
-  configurations.shade.each { dep ->
-    from(project.zipTree(dep)) {
-      exclude 'META-INF', 'META-INF/**'
-    }
-  }
-}
-
 signing {
 //    sign publishing.publications.mavenJava
 }
 
-publish.dependsOn test
+compileJava {
+  options.encoding = 'UTF-8'
+}
+
+javadoc {
+  options.encoding = 'UTF-8'
+}
+
+shadowJar {
+  archiveClassifier.set("")
+}
+
+task sourcesJar(type: Jar) {
+  from sourceSets.main.allSource
+  archiveClassifier.set('sources')
+}
+
+task javadocJar(type: Jar) {
+  from javadoc
+  archiveClassifier.set('javadoc')
+}
+
+//Ensure that in a maven publication only the shaded jar is present
+shadowJar.dependsOn jar
+publishMavenJavaPublicationToMavenRepository.dependsOn test, shadowJar
+publishMavenJavaPublicationToMavenLocal.dependsOn test, shadowJar
 
 test {
   useJUnit()

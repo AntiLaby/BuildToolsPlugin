@@ -1,6 +1,7 @@
 package de.heisluft.buildtools.tasks;
 
 import de.heisluft.buildtools.utils.BuildInfo;
+import net.md_5.specialsource.SpecialSource;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.TaskAction;
@@ -44,15 +45,10 @@ public class RemapServerJarTask extends BuildToolsTask {
     try {
       if(!Files.exists(mappedDir)) Files.createDirectory(mappedDir);
       //Load SpecialSource, SpecialSource2 jars
-      URLClassLoader ulc = new URLClassLoader(
-          new URL[]{new URL(jp.resolve("SpecialSource-2.jar").toUri().toString()), new URL(
-              jp.resolve("SpecialSource.jar").toUri().toString())}, getClass().getClassLoader());
+      URLClassLoader ulc = new URLClassLoader(new URL[]{new URL(jp.resolve("SpecialSource-2.jar").toUri().toString())}, getClass().getClassLoader());
       // Resolve main methods
       Method ss2Main = Class.forName("net.md_5.ss.SpecialSource", true, ulc)
           .getDeclaredMethod("main", String[].class);
-      Method ssMain = Class.forName("net.md_5.specialsource.SpecialSource", true, ulc)
-          .getDeclaredMethod("main", String[].class);
-
       // invoke main methods => remap
       if(!Files.exists(clMJ)) ss2Main.invoke(null, (Object) new String[]{"map", "-i", base
           .resolve("vanilla-nodeps.jar").toString(), "-m", mappingsPath
@@ -60,13 +56,12 @@ public class RemapServerJarTask extends BuildToolsTask {
       if(!Files.exists(memberMJ)) ss2Main.invoke(null,
           (Object) new String[]{"map", "-i", clMJ.toString(), "-m", mappingsPath
               .resolve(info.memberMappings).toString(), "-o", memberMJ.toString()});
-      ssMain.invoke(null,
-          (Object) new String[]{"--kill-lvt", "-i", memberMJ.toString(), "--access-transformer",
+      SpecialSource.main(new String[]{"--kill-lvt", "-i", memberMJ.toString(), "--access-transformer",
               mappingsPath
               .resolve(info.ats).toString(), "-m", mappingsPath
               .resolve(info.pkgMappings).toString(), "-o", mappedJar.toString()});
       ulc.close();
-    } catch(IOException | ReflectiveOperationException e) {
+    } catch(Exception e) {
       throw new RuntimeException("Could not remap jar", e);
     }
   }
